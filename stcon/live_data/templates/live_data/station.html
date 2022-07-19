@@ -1,0 +1,295 @@
+{% extends 'live_data/base.html' %}
+
+{% load static %}
+
+
+<!-- block content ------------------------------------------------------------- -->
+{% block content %}
+
+
+
+
+
+<div class="row">
+
+
+
+
+  <div class="col-12 mb-3">
+    <h5 class="text-center">Data from Station {{st_id}}</h5>
+    <h6 class="text-center">{{ station_address }}</h6>
+  </div>
+
+
+
+
+  <div class="col-md-6">
+
+    <div class="card ">
+      <h5 class="card-header">Station {{st_id}}</h5>
+      <div class="card-body">
+        <h6 class="card-title">Сurrent values</h6>
+
+        <canvas id="chart_bar"></canvas>
+
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="#" class="btn btn-secondary">Go somewhere</a>
+      </div>
+    </div>
+
+  </div>
+  <!-- end col-5 -->
+
+
+
+  <div class="col-md-6">
+
+    <div class="card ">
+      <h5 class="card-header">Station {{st_id}}</h5>
+      <div class="card-body">
+        <h6 class="card-title">Last 10 values null potencial</h6>
+
+        <canvas id="chart_line"></canvas>
+
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="#" class="btn btn-secondary">Go somewhere</a>
+      </div>
+    </div>
+
+  </div>
+  <!-- end col-6 -->
+
+
+
+
+
+  <div class="col-12 mt-md-4">
+
+    <div class="card ">
+      <h5 class="card-header">Station {{st_id}}</h5>
+      <div class="card-body">
+        <h6 class="card-title">Limit 10</h6>
+
+
+
+        <div class="table-responsive-sm">
+          <table class="table table-striped table-bordered border-primary ">
+            <thead>
+              <tr class="table-primary">
+                <th scope="col">#id</th>
+                <th scope="col">Voltage, V</th>
+                <th scope="col">Current, A</th>
+                <th scope="col">Potential #1, V</th>
+                <th scope="col">Potential #2, V</th>
+                <th scope="col">Time create</th>
+              </tr>
+            </thead>
+            <tbody>
+
+
+              {% for st in station_data %}
+              <tr>
+                <th scope="row">{{st.id}}</th>
+                <td>{{st.u}}</td>
+                <td>{{st.i}}</td>
+                <td>{{st.p1}}</td>
+                <td>{{st.p2}}</td>
+                <td>{{st.time_create}}</td>
+              </tr>
+              {% endfor %}
+
+
+
+            </tbody>
+          </table>
+        </div>
+
+
+
+
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="#" class="btn btn-secondary">Go somewhere</a>
+      </div>
+    </div>
+
+  </div>
+  <!-- end col-12 -->
+
+
+
+
+
+  
+
+  <div class="col-12">
+
+    <div class="card ">
+      <a name="grafic"></a>
+      <h5 class="card-header">Station {{st_id}}</h5>
+      <div class="card-body">
+        <h6 class="card-title">Line chart</h6>
+
+        <!-- <div class="preloader"> -->
+          <svg id="preloader__image" class="preloader__image" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path fill="currentColor"
+              d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z">
+            </path>
+          </svg>
+        <!-- </div> -->
+
+        <canvas id="chart_data_line"></canvas>
+
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="#calendar" class="btn btn-secondary">Сhoose time period</a>
+      </div>
+    </div>
+
+  </div>
+  <!-- end col-6 -->
+
+
+
+
+
+
+  <!-- Calendar left-->
+
+  <form name="form_calendar_left">
+    {% csrf_token %}
+    <input type="hidden" id="st_id" name="st_id" value="{{st_id}}">
+  </form>
+
+  <div class="col-md-6 col-sm-12 mt-md-4" id="calendar_left">   <!-- col-lg-4 -->
+  </div>
+
+  <!-- end calendar left -->
+
+
+
+
+  <!-- Calendar right-->
+
+  <div class="col-md-6 col-sm-12 mt-md-4" id="calendar_right">  <!-- col-lg-4 -->
+  </div>
+
+  <!-- end calendar right -->
+
+  <a name="calendar"></a>
+
+
+
+
+  
+
+<!-- temp -->
+<!-- end temp -->
+  <script src="{% static 'live_data/js/calendar.js' %}"></script>
+
+
+
+
+</div>
+
+
+ 
+<!-- charts -->
+<script src="{% static 'live_data/js/chart.min.js' %}"></script>
+<script>
+  let u,i,p1,p2;
+  u = {{u}};
+  i = {{i}};
+  p1 = {{p1}};
+  p2 = {{p2}};
+
+  const ctx = document.getElementById('chart_bar');
+  const chart_bar = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Voltage, V', 'Current, A', 'Potential #1, V', 'Potential #2, V'],
+      datasets: [{
+        label: 'Values',
+        data: [u, i, p1, p2],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          //'rgba(153, 102, 255, 0.2)',
+          //'rgba(255, 159, 64, 0.2)'
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          //'rgba(153, 102, 255, 1)',
+          //'rgba(255, 159, 64, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
+
+
+<!-- line chart -->
+<script>
+
+config_line = {
+  type: 'line',
+  data: {
+    datasets: [{
+      label: 'Null potencial',
+      data: {% autoescape off %}{{str_list_chart2}}{% endautoescape %},
+      borderColor: 'rgb(75, 192, 192)',
+    }]
+  },
+  options: {
+    responsive: true,
+    parsing: {
+      xAxisKey: 'x',
+      yAxisKey: 'y'
+    },
+    scales: {
+      y: {
+        suggestedMin: 0,
+        suggestedMax: 3,
+        title: {
+          display: true,
+          text: 'Potencial, Volt'
+        }
+      },
+      x: {
+        // min: 1,
+        // max: 10,
+        //offset: true,
+        ticks: {
+          //color: 'blue',
+          //stepSize: 0.5
+        },
+        title: {
+          display: true,
+          text: 'Date/Time'
+        }
+      }
+    }
+  }
+};
+
+
+const ctx_line = document.getElementById('chart_line');
+const chart_line = new Chart(ctx_line, config_line);
+</script>
+<!-- end charts -->
+
+
+{% endblock %}
+
+<!-- end block content ------------------------------------------------------------- -->

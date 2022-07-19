@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="{% static 'live_data/img/icons8-gear-32.png' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'live_data/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'live_data/font/bootstrap-icons.css' %}">
+  <link rel="stylesheet" href="{% static 'live_data/css/style.css' %}">
+  <title>{{ title }}</title>
+</head>
+
+<body class="background_class">
+
+  <!-- Menu -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand " href="{% url 'home'%}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Home">
+        <i class="bi-gear ms-lg-5" style="font-size: 2rem; color: #3e5c8f;"></i>
+        <i class="bi-wrench-adjustable  me-lg-5" style="font-size: 1.5rem; color: #3e5c8f;"></i>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse ms-lg-5" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-tabs">
+          <li class="nav-item ms-lg-5">
+            <a class="nav-link {% if title == 'Home' or title == 'Data' %} active {% endif %}" aria-current="page" href="{% url 'home'%}">Data</a>
+          </li>
+          <li class="nav-item ms-lg-4">
+            <a class="nav-link {% if title == 'Logs' %} active {% endif %}" href="{% url 'logs'%}">Logs</a>
+          </li>
+          <li class="nav-item ms-lg-4">
+            <a class="nav-link {% if title == 'Control' %} active {% endif %}" href="{% url 'control'%}">Control</a>
+          </li>
+          <li class="nav-item ms-lg-4 dropdown">
+            <a class="nav-link dropdown-toggle {% if title == 'Contacts' or title == 'Help' or title == 'About' %} active {% endif %}" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              Contacts
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="{% url 'contacts'%}">Contacts</a></li>
+              <li><a class="dropdown-item" href="{% url 'help_site'%}">Help</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="{% url 'about'%}">About</a></li>
+            </ul>
+          </li>
+          <li class="nav-item ms-lg-4 me-lg-4">
+            <a class="nav-link disabled">Views</a>
+          </li>
+          <li class="nav-item ms-lg-5">
+            <a class="nav-link" href="#">Login</a>
+          </li>
+        </ul>
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+
+
+  <div class="container-fluid">
+
+    <div class="row">
+
+
+      <!-- left menu -->
+      <div class="col-12 col-md-2 mt-3 p-5">
+
+        <ul class="nav flex-column">
+
+          <li class="nav-item mt-3">
+            <p>
+              <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStations"
+                aria-expanded="false" aria-controls="collapseStations">
+                <span class="fw-bold" style="color: #3e5c8f;">Stations</span>
+              </button>
+            </p>
+            <div class="collapse show" id="collapseStations">
+              <ul class="list-unstyled fw-normal pb-1 small ms-3">
+
+
+                {% for l in station_list %}
+                <li><a href="{{ l.get_absolute_url }}" class="btn" {% if l.address %} data-bs-toggle="tooltip" data-bs-placement="right" title="{{ l.address }}"  {% endif %} >Station {{ l.number }}</a></li>
+                {% endfor %}
+
+
+              </ul>
+            </div>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+        </ul>
+
+      </div>
+
+
+
+
+
+      <div class="col-12 col-md-10" >
+
+
+
+        <div class="row">
+          <!-- breadcrumb -->
+          <div class="col-12">
+            <ul class="breadcrumb m-3">
+              <li class="breadcrumb-item"><a href="#"   style="color: #3e5c8f;">Home</a></li>
+              <li class="breadcrumb-item active"><a href="#"   style="color: #3e5c8f;">Data</a></li>
+            </ul>
+          </div>
+        </div>
+
+
+
+
+
+        {% block content %}
+        {% endblock %}
+
+
+
+
+
+
+
+
+
+        <!--End <div class="col-12 col-md-10"> -->
+      </div>
+
+
+      <!--End <div class="row"> -->
+    </div>
+
+
+    <!--<div class="container-fluid">-->
+  </div>
+
+
+
+  <footer class="container-fluid bg-light  mt-3">
+    <div class="row  justify-content-md-center">
+      <div class="col-12 p-1">
+        <p class="text-center fw-lighter"><br>Last updated on May 16, 2022. <a href="">Found a bug?</a> Created using Django 4.0.4 </p>
+      </div>
+    </div>
+  </footer>
+
+
+<!-- 
+  <footer class="bd-footer fixed-bottom pу-3 mt-5 bg-light"> 
+    <div class="container py-2">
+      <div class="row">
+        <div class="col-12">
+          <p class="text-center fw-lighter"><br>Last updated on July 19, 2022. <a href="">Found a bug?</a> Created using Django 4.0.4 </p>
+        </div>         
+      </div>
+    </div>
+  </footer> -->
+
+
+
+  <script src="{% static 'live_data/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+
+</html>

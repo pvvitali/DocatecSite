@@ -1,0 +1,213 @@
+#Диплой проекта Django -> Ubuntu -> Nginx -> Uwsgi -> Postgresql
+
+sudo apt update
+sudo apt upgrade
+sudo apt-get install nginx uwsgi
+
+#Добавить пользователя www-data в группу vitali
+
+git clone https://github.com/nick_name/project.git
+
+#установим пакет для вирт. окружения и создадим его
+python3 -m venv venv
+
+#Активируем окружение
+. ./venv/bin/activate
+
+pip install django
+
+#архитектура
+projectname/
+...
+manage.py
+projectname/
+...
+settings.py
+wsgi.py
+...
+
+-Необходимо добавить ip вашего сервера в ALLOWED_HOSTS должно получиться что-то вроде ['1.1.1.1', '127.0.0.1']
+добавить STATIC_ROOT = '/home/vitali/work/static'
+
+-Вернитесь в папку с manage.py
+cd /home/vitali/work/имя вашего проекта
+
+-Далее подготовим сам Django проект. Проведем миграции и соберем статику в папку, которую мы ранее создали в work.
+
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py collectstatic
+python3 manage.py runserver
+
+-Виртуальное окружение можно выключить. Сделаем это командой:
+deactivate
+
+-Далее откроем файл nginx.conf и проверим в нем параметр user, он должен быть www-data.
+user www-data;
+-Нам понадобится файл uwsgi_params, который можно взять здесь: github.com/nginx/nginx/blob/master/conf/uwsgi_params.
+-Скачиваем его в корневую папку нашего проекта.
+
+-Структура файлов в корневой папке проекта:
+live_data  static  stcon.sock        stcon_uwsgi.ini
+manage.py  stcon   stcon_nginx.conf  uwsgi_params
+
+
+
+
+
+-Создаем файл mysite_nginx.conf:
+# mysite_nginx.conf
+
+upstream django {
+    server unix:///home/vitali/ConPowerSite/stcon/stcon.sock;
+    #server unix:///home/vitali/Temp/mysite/mysite.sock; # взаимодействие с uwsg             i через Unix-сокет (мы воспользуемся этим вариантом позже)
+    #server 127.0.0.1:8001; # взаимодействие с uwsgi через веб-порт
+}
+
+# конфигурация веб-сервера
+server {
+    # порт, который будет слушать веб-сервер в ожидании запросов от пользователй
+    listen      80;
+    # доменное имя
+    server_name     stcon.site; # замените на собственный домен или IP адрес
+    charset     utf-8;
+
+    # максимальный размер загружаемых на сервер данных
+    client_max_body_size 75M;
+
+    # обслуживание медиа файлов и статики
+    location /media  {
+        alias /home/vitali/ConPowerSite/stcon/media;  # расположение медиафайлов              (при необходимости измените)
+    }
+
+    location /static {
+        alias /home/vitali/ConPowerSite/stcon/static;  # расположение статики (п             ри необходимости измените)
+
+    }
+
+    # Остальные запросы перенаправляются в Django приложение
+    location / {
+        uwsgi_pass  django;
+        include     uwsgi_params; # файл uwsgi_params, который мы только что взя             ли с github
+    }
+}
+
+
+
+
+
+
+--Этот конфигурационный файл указывает nginx, что он должен отдавать пользователям медиа и статик файлы из файловой системы, а все остальные запросы перенаправлять в Django приложение. В больших проектах лучше использовать два сервера: один для обслуживания статик и медиа файлов, а другой для Django приложения. С небольшими, и тем более с учебными проектами, справится и один сервер.
+
+--В папке /etc/nginx/sites-enabled создаем ссылку на файл mysite_nginx.conf, чтобы nginx увидел его:
+sudo ln -s ~/path/to/your/mysite/mysite_nginx.conf /etc/nginx/sites-enabled/
+
+
+
+
+--Статика в одном месте
+
+--Перед запуском nginx поместим всю статику в папку static. Для этого добавляем в файл mysite/settings.py следующую строку:
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
+--И выполняем команду:
+python manage.py collectstatic
+
+--Проверка осблуживания статики и медиа
+
+--Перезапускаем nginx:
+sudo systemctl restart nginx
+
+--Помещаем файл с именем, например, media.png в папку /path/to/your/project/project/media.
+--В браузере переходим по адресу yourserver.com:8000/media/media.png и, если видим наш файл, значит мы все сделали правильно.
+
+
+
+
+--Конфигурация uWSGI через ini файл
+
+--Очень удобно все опции, с которыми мы запускаем uWSGI, указать в ini файле, а при запуске передавать только путь к этому файлу.
+
+--Создаем файл mysite_uwsgi.ini:
+#mysite_uwsgi.ini
+[uwsgi]
+
+# Настройки, связанные с Django
+# Корневая папка проекта (полный путь)
+chdir           = /home/vitali/ConPowerSite/stcon
+# Django wsgi файл
+module          = stcon.wsgi
+# полный путь к виртуальному окружению
+home            = /home/vitali/ConPowerSite/venv
+
+# общие настройки
+# master
+master          = true
+# максимальное количество процессов
+processes       = 5
+# полный путь к файлу сокета
+socket          = /home/vitali/ConPowerSite/stcon/stcon.sock
+# права доступа к файлу сокета
+# chmod-socket    = 664
+# очищать окружение от служебных файлов uwsgi по завершению
+vacuum          = true
+
+
+
+--Создаем сервис uwsgi и запускаем его:
+sudo vim /etc/systemd/system/uwsgi.service — пользовательские, вернее, администраторские сервисы.
+
+[Unit]
+Description=start uwsgi with imi file
+After=syslog.target
+
+[Service]
+User=www-data
+Group=www-data
+ExecStart=/usr/local/bin/uwsgi --ini /home/vitali/ConPowerSite/stcon/stcon_uwsgi.ini
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+--Сервис для UdpServer( Для сайта не нужно!):
+[Unit]
+Description=start Udp server
+After=network.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+# Даем знать systemd, что этот сервис представляет из себя лишь 1 процесс.
+# Ожидается, что процесс, настроенный с помощью ExecStart= является основным процессом службы
+Type=simple
+# Устанавливаем рабочую дирректорию службы
+WorkingDirectory=/home/vitali/UdpServer/
+# Указаываем пользователя и группу для работы службы
+User=vitali
+Group=vitali
+# Должна ли служба считаться активной, даже если все ее процессы завершены
+RemainAfterExit=no
+# Выполнить эту команду при запуске сервиса.
+ExecStart=python3 /home/vitali/UdpServer/Server_v2.py
+# Говорим, что нужно перезапускать сервис, если вдруг он упал
+Restart=on-failure
+# Таймаут на включение и выключение
+TimeoutSec=60
+
+
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable uwsgi.service
+sudo systemctl start uwsgi.service
+# sudo systemctl stop uwsgi.service
+# sudo systemctl restart uwsgi.service
+

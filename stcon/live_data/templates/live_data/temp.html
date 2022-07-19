@@ -1,0 +1,20 @@
+<li class="nav-item">
+  <p>
+    <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNormelStations"
+      aria-expanded="false" aria-controls="collapseNormelStations">
+      <span class="fw-bold" style="color: #3e5c8f;">Normel stations</span>
+    </button>
+  </p>
+  <div class="collapse show" id="collapseNormelStations">
+    <ul class="list-unstyled fw-normal pb-1 small ms-3">
+
+
+      {% for l in station_normel_list %}
+      <li><a href="{{ l.get_absolute_url }}" class="btn"{% if l.address %} data-bs-toggle="tooltip" data-bs-placement="right" title="{{ l.address }}"  {% endif %} >Normel №{{ l.number }}</a></li>
+      {% endfor %}
+
+
+    </ul>
+  </div>
+</li>
+<li><hr class="dropdown-divider"></li>
