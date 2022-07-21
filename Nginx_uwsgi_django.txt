@@ -4,7 +4,8 @@ sudo apt update
 sudo apt upgrade
 sudo apt-get install nginx uwsgi
 
-#Добавить пользователя www-data в группу vitali
+#Добавить пользователя www-data в группу vitali:
+sudo usermod -a -G vitali www-data
 
 git clone https://github.com/nick_name/project.git
 
