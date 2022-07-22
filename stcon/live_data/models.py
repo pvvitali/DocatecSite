@@ -72,6 +72,26 @@ class NormelListSt(models.Model):
         return reverse('station_normel', kwargs={'st_id': self.number})
 
 
+class St20(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    u = models.FloatField()
+    i = models.FloatField()
+    p1 = models.FloatField()
+    p2 = models.FloatField()
+    time_create = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'st_20'
+        verbose_name = 'Данные СКЗ №20'
+        verbose_name_plural = 'Данные СКЗ №20'
+        ordering = ['-time_create']
+
+    def __str__(self):
+        return 'Data at ' + str(self.time_create)
+
+
+
+
 class St30(models.Model):
     id = models.BigAutoField(primary_key=True)
     u = models.FloatField()

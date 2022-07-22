@@ -6,7 +6,7 @@ from datetime import datetime
 
 from .models import *
 #Список моделей
-station_object_list = {"30":St30, "31":St31}        #  "32":St32, "33":St33
+station_object_list = {"20":St20, "30":St30, "31":St31}        #  "32":St32, "33":St33
 station_object_list_normel = {"1":StNormel1 }       #  "2":StNormel2, "3":StNormel3, "4":StNormel4
 
 
