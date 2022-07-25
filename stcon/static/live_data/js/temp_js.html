@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let d = new Date(2022, 5);
+        let list_month = {
+            0: "Mo",
+            1: "To",
+            2: "We",
+            3: "Th",
+            4: "Fr",
+            5: "Sa",
+            6: "Su"
+        };
+        let m = d.getMonth().toString();
+        console.log(list_month[m]);
+
+        const newDate = new Date(2022, 5-1, 1, 10, 0, 2, 1);
+        console.log(newDate.getTime());
+
+        var datum = Date.parse('05/01/2022 00:00:00');
+        console.log(datum);
+
+        console.log(Math.random());
+        console.log(Math.random());
+        console.log(Math.random());
+        console.log(Math.random());
+        console.log(Math.random());
+        console.log(Math.random());
+        console.log(Math.random());
+    </script>
+</body>
+
+</html>
+
+
+
