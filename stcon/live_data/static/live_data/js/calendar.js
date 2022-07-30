@@ -114,7 +114,7 @@ function createCalendar(elem, year, month, day) {
 </table>
 </div>
 
-<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+<p class="card-text">Starting point of the time period.</p>
 <a href="#grafic" class="btn btn-secondary" id="button_summary_left">Show line chart</a>
 </div>
 </div>
@@ -362,7 +362,7 @@ function createCalendarRight(elem, year, month, day) {
 </table>
 </div>
 
-<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+<p class="card-text">Time period end point.</p>
 <a href="#grafic" class="btn btn-secondary" id="button_summary_right">Show line chart</a>
 </div>
 </div>
